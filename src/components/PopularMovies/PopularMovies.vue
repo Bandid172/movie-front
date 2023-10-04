@@ -1,73 +1,25 @@
 <template>
-    <div class="container-fluid ps-5 pe-5">
+    <div v-if="loading" class="loader">
+        <div v-if="loading" class="loading-spinner">
+            <div class="spinner-inner"></div>
+        </div>
+    </div>
+    <div v-if="loading === false" class="container-fluid ps-5 pe-5">
         <h2 class="mt-5 uppercase text-yellow-400 text-lg mb-5">
             Popular Movies
         </h2>
-        <div class="grid 2xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 gap-5 justify-center">
-            <div class="movie-card">
-                <img src="../../assets/images/71Yt-BtAfEL._AC_UF894,1000_QL80_.jpg" class="hover:opacity-75 transition easy-in-out duration-150" />
+        <div
+            class="grid 2xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 gap-5 justify-center">
+            <div v-for="movie of getMovies" :key="movie.id" class="movie-card">
+                <img :src="'http://localhost:8505' + movie.moviePoster.contentUrl"
+                     class="hover:opacity-75 transition easy-in-out duration-150 2xl:h-96"/>
                 <div class="movie-info 2xl:pe-5 mt-2 mb-2">
-                    <router-link to="/movies/">Harry Potter and The Prisoner of Azkaban</router-link>
+                    <router-link :to="'/movie/' + movie.id">{{ movie.name }}</router-link>
                     <div class="flex gap-2 items-center mb-1 mt-2">
-                        <img src="../../assets/images/New_Fresh.svg" class="w-5 h-5"/>
-                        <p>47% | 2020-10-01</p>
+                        <img class="w-5 h-5" src="../../assets/images/New_Fresh.svg"/>
+                        <p>{{ movie.rottenTomatoes }} | {{ movie.releaseYear }} </p>
                     </div>
-                    <span>Science Fiction, Thriller, Drama</span>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="../../assets/images/fECBtHlr0RB3foNHDiCBXeg9Bv9.jpg" class="hover:opacity-75 transition easy-in-out duration-150" />
-                <div class="movie-info 2xl:pe-5 mt-2 mb-2">
-                    <router-link to="/movies/">Harry Potter and The Goblet of Fire</router-link>
-                    <div class="flex gap-2 items-center mb-1 mt-2">
-                        <img src="../../assets/images/New_Fresh.svg" class="w-5 h-5"/>
-                        <p>47% | 2020-10-01</p>
-                    </div>
-                    <span>Science Fiction, Thriller, Drama</span>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="../../assets/images/02def587918a88fcec51b5f2eb1c1897.jpg" class="hover:opacity-75 transition easy-in-out duration-150" />
-                <div class="movie-info 2xl:pe-5 mt-2 mb-2">
-                    <router-link to="/movies/">The Village</router-link>
-                    <div class="flex gap-2 items-center mb-1 mt-2">
-                        <img src="../../assets/images/New_Fresh.svg" class="w-5 h-5"/>
-                        <p>47% | 2020-10-01</p>
-                    </div>
-                    <span>Science Fiction, Thriller, Drama</span>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="../../assets/images/8e2SowBz7plSPrayGdUeGJKrC8.jpg" class="hover:opacity-75 transition easy-in-out duration-150" />
-                <div class="movie-info 2xl:pe-5 mt-2 mb-2">
-                    <router-link to="/movies/">Till Death</router-link>
-                    <div class="flex gap-2 items-center mb-1 mt-2">
-                        <img src="../../assets/images/New_Fresh.svg" class="w-5 h-5"/>
-                        <p>47% | 2020-10-01</p>
-                    </div>
-                    <span>Science Fiction, Thriller, Drama</span>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="../../assets/images/chamber-of-secrets-wizarding-world-poster.jpg" class="hover:opacity-75 transition easy-in-out duration-150" />
-                <div class="movie-info 2xl:pe-5 mt-2 mb-2">
-                    <router-link to="/movies/">Harry Potter and The Chamber of Secrets</router-link>
-                    <div class="flex gap-2 items-center mb-1 mt-2">
-                        <img src="../../assets/images/New_Fresh.svg" class="w-5 h-5"/>
-                        <p>47% | 2020-10-01</p>
-                    </div>
-                    <span>Science Fiction, Thriller, Drama</span>
-                </div>
-            </div>
-            <div class="movie-card">
-                <img src="../../assets/images/71C4bkYFWSL._AC_SY741_.jpg" class="hover:opacity-75 transition easy-in-out duration-150" />
-                <div class="movie-info 2xl:pe-5 mt-2 mb-2">
-                    <router-link to="/movies/">Harry Potter and The Half Blood Prince</router-link>
-                    <div class="flex gap-2 items-center mb-1 mt-2">
-                        <img src="../../assets/images/New_Fresh.svg" class="w-5 h-5"/>
-                        <p>47% | 2020-10-01</p>
-                    </div>
-                    <span>Science Fiction, Thriller, Drama</span>
+                    <span v-for="category of movie.category" :key="category">{{ category.name + ' ' }}</span>
                 </div>
             </div>
         </div>
@@ -75,11 +27,68 @@
 </template>
 
 <script>
+import {mapActions, mapGetters} from "vuex";
+
 export default {
-    name: "PopularMovies"
+    name: "PopularMovies",
+    data() {
+        return {
+            loading: false
+        }
+    },
+
+    methods: {
+        ...mapActions(['fetchMovies'])
+    },
+    computed: {
+        ...mapGetters(['getMovies'])
+    },
+
+    mounted() {
+        this.loading = true
+        this.fetchMovies()
+            .finally(() => {
+                this.loading = false
+            })
+    }
 }
 </script>
 
 <style scoped>
+
+.loader {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    position: relative;
+}
+
+.spinner-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 6px solid #f3f3f3;
+    border-top-color: #3498db;
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 
 </style>

@@ -1,18 +1,34 @@
 import {createRouter, createWebHistory} from "vue-router";
-import HomePage from "@/pages/HomePage";
+import LoginPage from "@/pages/LoginPage";
 
 const routes = [
     {
         path: '/',
-        component: HomePage
+        component: LoginPage
     },
     {
-        path: '/movie/:id',
+        path: '/movie/:movieId',
         component: () => import('@/pages/MoviePage')
     },
     {
-        path: '/login',
-        component: () => import('@/pages/LoginPage')
+        path: '/home',
+        component: () => import('@/pages/HomePage')
+    },
+    {
+        path: '/profile',
+        component: () => import('@/pages/ProfilePage')
+    },
+    {
+        path: '/actors',
+        component: () => import('@/pages/ActorsPage')
+    },
+    {
+        path: '/add-movie',
+        component: () => import('@/pages/AddMovie')
+    },
+    {
+        path: '/actors/:actorId',
+        component: () => import('@/pages/ActorProfile')
     }
 ]
 
